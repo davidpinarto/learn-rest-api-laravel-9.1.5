@@ -13,24 +13,68 @@ class EmployeesControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJson([
-            [
-                "id" => 1,
-                "name" => "Eko",
-                "position" => "Frontend Developer",
-                "salary" => "10000000",
-            ],
-            [
-                "id" => 2,
-                "name" => "David",
-                "position" => "Backend Developer",
-                "salary" => "10000000",
-            ],
-            [
-                "id" => 3,
-                "name" => "Bryan",
-                "position" => "Architect",
-                "salary" => "15000000",
-            ],
+            'status' => 'success',
+            'data' => [
+                [
+                    "id" => 1,
+                    "name" => "Eko",
+                    "position" => "Frontend Developer",
+                    "salary" => "10000000",
+                ],
+                [
+                    "id" => 2,
+                    "name" => "David",
+                    "position" => "Backend Developer",
+                    "salary" => "10000000",
+                ],
+                [
+                    "id" => 3,
+                    "name" => "Bryan",
+                    "position" => "Architect",
+                    "salary" => "15000000",
+                ],
+            ]
+        ]);
+    }
+
+    public function testPostEmployeeController()
+    {
+        $response = $this->post('/api/employees', [
+            'name' => 'Iswandi',
+            'position' => 'doctor',
+            'salary' => '50000000'
+        ]);
+
+        $response->assertStatus(201);
+        $response->assertJson([
+            'status' => 'success',
+            'message' => 'karyawan berhasil di tambahkan',
+            'data' => [
+                [
+                    "id" => 1,
+                    "name" => "Eko",
+                    "position" => "Frontend Developer",
+                    "salary" => "10000000",
+                ],
+                [
+                    "id" => 2,
+                    "name" => "David",
+                    "position" => "Backend Developer",
+                    "salary" => "10000000",
+                ],
+                [
+                    "id" => 3,
+                    "name" => "Bryan",
+                    "position" => "Architect",
+                    "salary" => "15000000",
+                ],
+                [
+                    "id" => 4,
+                    'name' => 'Iswandi',
+                    'position' => 'doctor',
+                    'salary' => '50000000'
+                ],
+            ]
         ]);
     }
 }

@@ -36,7 +36,12 @@ class EmployeesController extends Controller
 
     public function getEmployees(Request $request): JsonResponse
     {
-        return response()->json($this->employees);
+        $response = [
+            'status' => 'success',
+            'data' => $this->employees
+        ]
+        ;
+        return response()->json($response);
     }
 
     // public function getEmployees(Request $request): Response
@@ -44,4 +49,24 @@ class EmployeesController extends Controller
     //     return response(json_encode($this->employees), 200)
     //       ->header('Content-Type', 'application/json');
     // }
+
+    public function postEmployee(Request $request): JsonResponse
+    {
+        $employee = [
+            'id' => count($this->employees) + 1,
+            'name' => $request->input('name'),
+            'position' => $request->input('position'),
+            'salary' => $request->input('salary')
+        ];
+        // $this->employees[] = $employee;
+        array_push($this->employees, $employee);
+
+        $response = [
+            'status' => 'success',
+            'message' => 'karyawan berhasil di tambahkan',
+            'data' => $this->employees,
+        ];
+
+        return response()->json($response, 201);
+    }
 }
