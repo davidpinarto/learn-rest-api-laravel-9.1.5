@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 
 class EmployeesController extends Controller
 {
@@ -39,8 +41,7 @@ class EmployeesController extends Controller
         $response = [
             'status' => 'success',
             'data' => $this->employees
-        ]
-        ;
+        ];
         return response()->json($response);
     }
 
@@ -52,21 +53,63 @@ class EmployeesController extends Controller
 
     public function postEmployee(Request $request): JsonResponse
     {
-        $employee = [
-            'id' => count($this->employees) + 1,
-            'name' => $request->input('name'),
-            'position' => $request->input('position'),
-            'salary' => $request->input('salary')
-        ];
-        // $this->employees[] = $employee;
-        array_push($this->employees, $employee);
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'position' => 'required|string|max:255',
+                'salary' => 'required|numeric|min:0',
+            ]);
 
-        $response = [
-            'status' => 'success',
-            'message' => 'karyawan berhasil di tambahkan',
-            'data' => $this->employees,
-        ];
+            $employee = [
+                'id' => count($this->employees) + 1,
+                'name' => $validatedData['name'],
+                'position' => $validatedData['position'],
+                'salary' => $validatedData['salary'],
+            ];
+            array_push($this->employees, $employee);
 
-        return response()->json($response, 201);
+            $response = [
+                'status' => 'success',
+                'message' => 'karyawan berhasil di tambahkan',
+                'data' => $this->employees,
+            ];
+            return response()->json($response, 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $e->validator->errors()->first()
+            ], 400);
+        }
+    }
+
+    public function getEmployeeByName(Request $request): JsonResponse
+    {
+        $name = $request->query('name');
+
+        if ($name) {
+            try {
+                $employee = collect($this->employees)->firstWhere('name', $name);
+
+                if ($employee) {
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'karyawan berhasil ditemukan',
+                        'data' => $employee,
+                    ]);
+                } else {
+                    throw new Exception("karyawan tidak ditemukan");
+                }
+            } catch (Exception $e) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => $e->getMessage(),
+                ], 404);
+            }
+        }
+
+        return response()->json([
+            'status' => 'fail',
+            'message' => 'karyawan tidak ditemukan',
+        ], 404);
     }
 }
