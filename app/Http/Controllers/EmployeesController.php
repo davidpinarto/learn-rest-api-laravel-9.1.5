@@ -2,76 +2,56 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Employees;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Str;
 
 class EmployeesController extends Controller
 {
-    private $employees;
-
-    public function __construct()
-    {
-        $this->employees = [
-            [
-                "id" => 1,
-                "name" => "Eko",
-                "position" => "Frontend Developer",
-                "salary" => "10000000",
-            ],
-            [
-                "id" => 2,
-                "name" => "David",
-                "position" => "Backend Developer",
-                "salary" => "10000000",
-            ],
-            [
-                "id" => 3,
-                "name" => "Bryan",
-                "position" => "Architect",
-                "salary" => "15000000",
-            ],
-        ];
-    }
-
     public function getEmployees(Request $request): JsonResponse
     {
+        $employees = Employees::all();
+
         $response = [
             'status' => 'success',
-            'data' => $this->employees
+            'data' => $employees
         ];
         return response()->json($response);
     }
 
     // public function getEmployees(Request $request): Response
     // {
-    //     return response(json_encode($this->employees), 200)
-    //       ->header('Content-Type', 'application/json');
+    //     $employees = Employees::all();
+    //     return response(json_encode($employees), 200)
+    //         ->header('Content-Type', 'application/json');
     // }
 
     public function postEmployee(Request $request): JsonResponse
     {
         try {
             $validatedData = $request->validate([
-                'name' => 'required|string|max:255',
-                'position' => 'required|string|max:255',
-                'salary' => 'required|numeric|min:0',
+                'first_name' => 'required|string|max:20',
+                'last_name' => 'required|string|max:20',
+                'gender' => 'required|string|in:male,female',
+                'email' => 'required|email|max:50|unique:employees',
+                'phone_number' => 'nullable|string|max:50',
+                'hire_date' => 'required|string',
+                'job_title' => 'required|string',
+                'department_id' => 'required|string|exists:departments,id',
             ]);
 
-            $employee = [
-                'id' => count($this->employees) + 1,
-                'name' => $validatedData['name'],
-                'position' => $validatedData['position'],
-                'salary' => $validatedData['salary'],
-            ];
-            array_push($this->employees, $employee);
+            $validatedData['id'] = 'employee-' . Str::random(16);
+
+            $employee = Employees::create($validatedData);
 
             $response = [
                 'status' => 'success',
-                'message' => 'karyawan berhasil di tambahkan',
-                'data' => $this->employees,
+                'message' => 'Karyawan berhasil ditambahkan',
+                'data' => $employee,
             ];
             return response()->json($response, 201);
         } catch (ValidationException $e) {
@@ -88,16 +68,18 @@ class EmployeesController extends Controller
 
         if ($name) {
             try {
-                $employee = collect($this->employees)->firstWhere('name', $name);
+                $employees = Employees::where('first_name', 'ilike', "%$name%")
+                    ->orWhere('last_name', 'ilike', "%$name%")
+                    ->get();
 
-                if ($employee) {
+                if (count($employees)) {
                     return response()->json([
                         'status' => 'success',
-                        'message' => 'karyawan berhasil ditemukan',
-                        'data' => $employee,
+                        'message' => 'Karyawan berhasil ditemukan',
+                        'data' => $employees,
                     ]);
                 } else {
-                    throw new Exception("karyawan tidak ditemukan");
+                    throw new Exception("Karyawan tidak ditemukan");
                 }
             } catch (Exception $e) {
                 return response()->json([
@@ -109,7 +91,7 @@ class EmployeesController extends Controller
 
         return response()->json([
             'status' => 'fail',
-            'message' => 'karyawan tidak ditemukan',
-        ], 404);
+            'message' => 'Karyawan tidak ditemukan',
+        ], 400);
     }
 }
