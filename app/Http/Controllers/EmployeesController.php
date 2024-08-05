@@ -92,6 +92,6 @@ class EmployeesController extends Controller
         return response()->json([
             'status' => 'fail',
             'message' => 'Karyawan tidak ditemukan',
-        ], 400);
+        ], 404);
     }
 }
