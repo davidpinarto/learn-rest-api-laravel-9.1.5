@@ -143,4 +143,27 @@ class EmployeesController extends Controller
             ], 404);
         }
     }
+
+    public function deleteEmployeeById(Request $request, string $id): JsonResponse
+    {
+        try {
+            $employee = Employees::find($id); // null or object
+
+            if ($employee) {
+                $employee->delete(); 
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Data karyawan berhasil dihapus',
+                ]);
+            } else {
+                throw new Exception('Karyawan tidak ditemukan');
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $e->getMessage(),
+            ], 404);
+        }
+    }
 }
