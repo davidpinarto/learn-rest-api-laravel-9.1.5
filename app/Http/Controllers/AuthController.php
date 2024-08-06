@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\RefreshToken;
 use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use Tymon\JWTAuth\Exceptions\JWTException;
-use Illuminate\Support\Str;
+// use Illuminate\Support\Facades\Auth;
+// use Tymon\JWTAuth\Facades\JWTAuth;
+// use Tymon\JWTAuth\Exceptions\JWTException;
+// use Illuminate\Support\Str;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Firebase\JWT\JWT;
 
 class AuthController extends Controller
 {
@@ -52,22 +53,21 @@ class AuthController extends Controller
                     'email' => $user[0]->getOriginal()['email'],
                     'exp' => '360000' // seharusnya 60 detik, namun untuk memperlancar proses developemnt saya set 360000
                 ];
-                $accessToken = JWTAuth::claims($accessTokenClaims)->make();
-                var_dump($accessToken);
+                $accessToken = JWT::encode($accessTokenClaims, env('JWT_SECRET'), 'HS256');
 
                 $refreshTokenClaims = [
                     'id' => $user[0]->getOriginal()['id'],
                     'email' => $user[0]->getOriginal()['email'],
                 ];
-                $refreshToken = JWTAuth::customClaims($refreshTokenClaims)->make();
-                RefreshToken::create($refreshToken);
+                $refreshToken = JWT::encode($refreshTokenClaims, env('JWT_SECRET'), 'HS256');
+                RefreshToken::create(['token' => $refreshToken]);
 
                 $response = [
                     'status' => 'success',
                     'message' => 'login success',
                     'data' => [
-                        $accessToken,
-                        $refreshToken
+                        'access_token' => $accessToken,
+                        'refresh_token' => $refreshToken
                     ],
                 ];
                 return response()->json($response, 201);
@@ -75,15 +75,17 @@ class AuthController extends Controller
                 throw new Exception('wrong email or password');
             }
         } catch (ValidationException $e) {
-            return response()->json([
+            $response = [
                 'status' => 'fail',
                 'message' => $e->validator->errors()->first(),
-            ], 400);
+            ];
+            return response()->json($response, 400);
         } catch (Exception $e) {
-            return response()->json([
+            $response = [
                 'status' => 'fail',
                 'message' => $e->getMessage(),
-            ], 401);
+            ];
+            return response()->json($response, 401);
         }
     }
 
