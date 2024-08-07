@@ -5,10 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\RefreshToken;
 use Illuminate\Http\Request;
 use App\Models\User;
-// use Illuminate\Support\Facades\Auth;
-// use Tymon\JWTAuth\Facades\JWTAuth;
-// use Tymon\JWTAuth\Exceptions\JWTException;
-// use Illuminate\Support\Str;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -186,6 +182,7 @@ class AuthController extends Controller
             'id' => $id,
             'email' => $email,
             'exp' => time() + '360000' // seharusnya 60 detik, namun untuk memperlancar proses developemnt saya set 360000
+            // 'exp' => time() + 30
         ];
         $accessToken = JWT::encode($accessTokenClaims, env('JWT_SECRET'), 'HS256');
         return $accessToken;
