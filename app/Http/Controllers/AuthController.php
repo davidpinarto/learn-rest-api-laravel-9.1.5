@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use stdClass;
 
 class AuthController extends Controller
 {
@@ -91,7 +92,7 @@ class AuthController extends Controller
         }
     }
 
-    public function renewToken(Request $request)
+    public function putAuthentication(Request $request)
     {
         /**
          * TODO
@@ -100,6 +101,33 @@ class AuthController extends Controller
          * - create new access token
          * - return new access token
          */
+        try {
+            $refreshToken = $request->input('refreshToken'); // string
+
+            if (!$refreshToken) {
+                throw new Exception('Missing token on request body');
+            }
+
+            $this->_verifyRefreshTokenFromDB($refreshToken);
+            $decoded = $this->_verifyRefreshTokenSecret($refreshToken);
+
+            $newAccessToken = $this->_generateAccessToken($decoded->id, $decoded->email);
+
+            $response = [
+                'status' => 'success',
+                'message' => 'Create new access token success',
+                'data' => [
+                    'access_token' => $newAccessToken
+                ]
+            ];
+            return response()->json($response);
+        } catch (Exception $e) {
+            $response = [
+                'status' => 'fail',
+                'message' => $e->getMessage(),
+            ];
+            return response()->json($response, 400);
+        }
     }
 
     public function logout(Request $request)
@@ -141,5 +169,31 @@ class AuthController extends Controller
         if (!$refreshTokenFromDB) {
             throw new Exception('Token is not valid');
         }
+    }
+
+    private function _verifyRefreshTokenSecret(string $refreshToken): stdClass
+    {
+        // if the secret wrong it will throw "Signature verification failed"
+        $decoded = JWT::decode($refreshToken,  new Key(env('JWT_SECRET'), 'HS256'));  // object(stdClass)
+        return $decoded;
+    }
+
+    private function _verifyRefreshTokenFromDB(string $refreshToken): void
+    {
+        $refreshTokenFromDB = RefreshToken::where('token', $refreshToken)->first(); // null or class model
+        if (!$refreshTokenFromDB) {
+            throw new Exception('Token is not valid');
+        }
+    }
+
+    private function _generateAccessToken(string $id, string $email): string
+    {
+        $accessTokenClaims = [
+            'id' => $id,
+            'email' => $email,
+            'exp' => time() + '360000' // seharusnya 60 detik, namun untuk memperlancar proses developemnt saya set 360000
+        ];
+        $accessToken = JWT::encode($accessTokenClaims, env('JWT_SECRET'), 'HS256');
+        return $accessToken;
     }
 }
