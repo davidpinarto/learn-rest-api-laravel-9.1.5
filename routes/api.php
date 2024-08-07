@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployeesController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -14,9 +16,15 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::middleware('jwt.verify')->group(function () {
+    Route::get('/employees', [EmployeesController::class, 'getEmployees']);
+    Route::post('/employees', [EmployeesController::class, 'postEmployee']);
+    Route::get('/employees/search', [EmployeesController::class, 'getEmployeeByName']);
+    Route::put('/employees/{id}', [EmployeesController::class, 'updateEmployeeById']);
+    Route::delete('/employees/{id}', [EmployeesController::class, 'deleteEmployeeById']);
+});
 
-Route::get('/employees', [EmployeesController::class, 'getEmployees']);
-Route::post('/employees', [EmployeesController::class, 'postEmployee']);
-Route::get('/employees/search', [EmployeesController::class, 'getEmployeeByName']);
-Route::put('/employees/{id}', [EmployeesController::class, 'updateEmployeeById']);
-Route::delete('/employees/{id}', [EmployeesController::class, 'deleteEmployeeById']);
+Route::post('/users', [UserController::class, 'postUser']);
+Route::post('/authentications', [AuthController::class, 'postAuthentication']);
+Route::delete('/authentications', [AuthController::class, 'deleteAuthentication']);
+Route::put('/authentications', [AuthController::class, 'putAuthentication']);

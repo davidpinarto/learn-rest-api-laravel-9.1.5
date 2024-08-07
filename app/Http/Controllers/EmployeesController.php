@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employees;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -23,16 +24,16 @@ class EmployeesController extends Controller
         return response()->json($response);
     }
 
-    // public function getEmployees(Request $request): Response
-    // {
-    //     $employees = Employees::all();
-    //     return response(json_encode($employees), 200)
-    //         ->header('Content-Type', 'application/json');
-    // }
-
     public function postEmployee(Request $request): JsonResponse
     {
         try {
+            $userData = $request->userData;
+            $user = User::where('id', $userData['id'])->first();
+
+            if (!$user->is_admin) {
+                throw new Exception('only admin can add new employee data');
+            }
+
             $validatedData = $request->validate([
                 'first_name' => 'required|string|max:20',
                 'last_name' => 'required|string|max:20',
@@ -50,7 +51,7 @@ class EmployeesController extends Controller
 
             $response = [
                 'status' => 'success',
-                'message' => 'Karyawan berhasil ditambahkan',
+                'message' => 'new employee added successfully',
                 'data' => $employee,
             ];
             return response()->json($response, 201);
@@ -58,6 +59,11 @@ class EmployeesController extends Controller
             return response()->json([
                 'status' => 'fail',
                 'message' => $e->validator->errors()->first()
+            ], 400);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $e->getMessage(),
             ], 400);
         }
     }
@@ -78,11 +84,10 @@ class EmployeesController extends Controller
                 if (count($employees)) {
                     return response()->json([
                         'status' => 'success',
-                        'message' => 'Karyawan berhasil ditemukan',
                         'data' => $employees,
                     ]);
                 } else {
-                    throw new Exception("Karyawan tidak ditemukan");
+                    throw new Exception("employee not found");
                 }
             } catch (Exception $e) {
                 return response()->json([
@@ -94,13 +99,20 @@ class EmployeesController extends Controller
 
         return response()->json([
             'status' => 'fail',
-            'message' => 'Karyawan tidak ditemukan',
+            'message' => 'employee not found',
         ], 404);
     }
 
     public function updateEmployeeById(Request $request, string $id): JsonResponse
     {
         try {
+            $userData = $request->userData;
+            $user = User::where('id', $userData['id'])->first();
+
+            if (!$user->is_admin) {
+                throw new Exception('only admin can update employee data');
+            }
+
             $employee = Employees::find($id); // null or object
             // dump($employee);
             // dump(is_object($employee));
@@ -125,11 +137,11 @@ class EmployeesController extends Controller
 
                 return response()->json([
                     'status' => 'success',
-                    'message' => 'Data karyawan berhasil diperbarui',
+                    'message' => 'employee updated successfully',
                     'data' => $employee,
                 ]);
             } else {
-                throw new Exception('Karyawan tidak ditemukan');
+                throw new Exception('employee not found');
             }
         } catch (ValidationException $e) {
             return response()->json([
@@ -147,18 +159,23 @@ class EmployeesController extends Controller
     public function deleteEmployeeById(Request $request, string $id): JsonResponse
     {
         try {
-            $employee = Employees::find($id); // null or object
+            $userData = $request->userData;
+            $user = User::where('id', $userData['id'])->first();
 
-            if ($employee) {
-                $employee->delete(); 
-
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Data karyawan berhasil dihapus',
-                ]);
-            } else {
-                throw new Exception('Karyawan tidak ditemukan');
+            if (!$user->is_admin) {
+                throw new Exception('only admin can delete employee data');
             }
+
+            $employee = Employees::find($id)->delete(); // int(0) or int(1)
+
+            if (!$employee) {
+                throw new Exception('employee not found');
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'employee deleted successfully',
+            ]);
         } catch (Exception $e) {
             return response()->json([
                 'status' => 'fail',

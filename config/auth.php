@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
+        'guard' => 'api',
         'passwords' => 'users',
     ],
 
@@ -35,9 +35,16 @@ return [
     |
     */
 
+    /**
+     * guard digunakan untuk mengecek authenticationnya dari mana pada routes, web -> session, api -> jwt
+     */
     'guards' => [
         'web' => [
             'driver' => 'session',
+            'provider' => 'users',
+        ],
+        'api' => [
+            'driver' => 'jwt',
             'provider' => 'users',
         ],
     ],
