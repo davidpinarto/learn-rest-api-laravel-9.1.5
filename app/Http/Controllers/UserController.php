@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function register(Request $request): JsonResponse
+    public function postUser(Request $request): JsonResponse
     {
         try {
             $validatedData = $request->validate([

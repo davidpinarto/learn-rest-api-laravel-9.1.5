@@ -18,7 +18,7 @@ use stdClass;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function postAuthentication(Request $request)
     {
         /**
          * TODO
@@ -130,7 +130,7 @@ class AuthController extends Controller
         }
     }
 
-    public function logout(Request $request)
+    public function deleteAuthentication(Request $request)
     {
         /**
          * TODO

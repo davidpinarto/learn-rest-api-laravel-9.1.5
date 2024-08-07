@@ -23,9 +23,9 @@ Route::get('/employees/search', [EmployeesController::class, 'getEmployeeByName'
 Route::put('/employees/{id}', [EmployeesController::class, 'updateEmployeeById']);
 Route::delete('/employees/{id}', [EmployeesController::class, 'deleteEmployeeById']);
 
-Route::post('/register', [UserController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-Route::delete('/logout', [AuthController::class, 'logout']);
+Route::post('/users', [UserController::class, 'postUser']);
+Route::post('/authentications', [AuthController::class, 'postAuthentication']);
+Route::delete('/authentications', [AuthController::class, 'deleteAuthentication']);
 Route::put('/authentications', [AuthController::class, 'putAuthentication']);
 
 // Route::middleware('auth')->get('/employees', [EmployeesController::class, 'getEmployees']);
