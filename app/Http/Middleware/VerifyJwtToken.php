@@ -24,7 +24,11 @@ class VerifyJwtToken
             // var_dump($token);
 
             if (!$token) {
-                return response()->json(['message' => 'Missing token on the Bearer'], 401);
+                $response = [
+                    'status' => 'fail',
+                    'message' => 'Missing token on the Bearer'
+                ];
+                return response()->json($response, 401);
             }
 
             $credentials = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
@@ -37,7 +41,11 @@ class VerifyJwtToken
 
             return $next($request);
         } catch (Exception $e) {
-            return response()->json(['message' => 'Token is invalid or expired'], 401);
+            $response = [
+                'status' => 'fail',
+                'message' => 'Token is invalid or expired'
+            ];
+            return response()->json($response, 401);
         }
     }
 }

@@ -10,11 +10,12 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Illuminate\Http\JsonResponse;
 use stdClass;
 
 class AuthController extends Controller
 {
-    public function postAuthentication(Request $request)
+    public function postAuthentication(Request $request): JsonResponse
     {
         /**
          * TODO
@@ -72,7 +73,7 @@ class AuthController extends Controller
         }
     }
 
-    public function putAuthentication(Request $request)
+    public function putAuthentication(Request $request): JsonResponse
     {
         /**
          * TODO
@@ -115,7 +116,7 @@ class AuthController extends Controller
         }
     }
 
-    public function deleteAuthentication(Request $request)
+    public function deleteAuthentication(Request $request): JsonResponse
     {
         /**
          * TODO
