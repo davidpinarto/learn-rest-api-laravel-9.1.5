@@ -44,26 +44,10 @@ class AuthController extends Controller
             if ($user) {
                 $inputPassword = $validatedData['password'];
                 $hashedPassword = $user->password;
+                $this->_verifyMatchPassword($inputPassword, $hashedPassword);
 
-                // var_dump(Hash::check($inputPassword, $hashedPassword));
-                if (!Hash::check($inputPassword, $hashedPassword)) {
-                    throw new Exception('wrong email or password');
-                }
-
-                $accessTokenClaims = [
-                    'id' => $user->id,
-                    'email' => $user->email,
-                    'exp' => time() + '360000' // seharusnya 60 detik, namun untuk memperlancar proses developemnt saya set 360000
-                ];
-                $accessToken = JWT::encode($accessTokenClaims, env('JWT_SECRET'), 'HS256');
-
-                $refreshTokenClaims = [
-                    'id' => $user->id,
-                    'email' => $user->email,
-                    'unique' => uniqid(), // agar token berubah setiap dibuat
-                ];
-                $refreshToken = JWT::encode($refreshTokenClaims, env('JWT_SECRET'), 'HS256');
-                RefreshToken::create(['token' => $refreshToken]);
+                $accessToken = $this->_generateAccessToken($user->id, $user->email);
+                $refreshToken = $this->_generateAndPutRefreshTokenOnDB($user->id, $user->email);
 
                 $response = [
                     'status' => 'success',
@@ -102,11 +86,10 @@ class AuthController extends Controller
          * - return new access token
          */
         try {
-            $refreshToken = $request->input('refreshToken'); // string
-
-            if (!$refreshToken) {
-                throw new Exception('Missing token on request body');
-            }
+            $validatedData = $request->validate([
+                'refreshToken' => 'required|string',
+            ]);
+            $refreshToken = $validatedData['refreshToken'];
 
             $this->_verifyRefreshTokenFromDB($refreshToken);
             $decoded = $this->_verifyRefreshTokenSecret($refreshToken);
@@ -121,12 +104,18 @@ class AuthController extends Controller
                 ]
             ];
             return response()->json($response);
+        } catch (ValidationException $e) {
+            $response = [
+                'status' => 'fail',
+                'message' => $e->validator->errors()->first(),
+            ];
+            return response()->json($response, 400);
         } catch (Exception $e) {
             $response = [
                 'status' => 'fail',
                 'message' => $e->getMessage(),
             ];
-            return response()->json($response, 400);
+            return response()->json($response, 401);
         }
     }
 
@@ -138,11 +127,10 @@ class AuthController extends Controller
          * - delete refresh token in the database
          */
         try {
-            $refreshToken = $request->input('refreshToken'); // string
-            // var_dump($refreshToken);
-            if (!$refreshToken) {
-                throw new Exception('Missing token on request body');
-            }
+            $validatedData = $request->validate([
+                'refreshToken' => 'required|string',
+            ]);
+            $refreshToken = $validatedData['refreshToken'];
 
             $this->_verifyAndDeleteRefreshTokenFromDB($refreshToken);
 
@@ -151,6 +139,12 @@ class AuthController extends Controller
                 'message' => 'Token deleted successfully'
             ];
             return response()->json($response);
+        } catch (ValidationException $e) {
+            $response = [
+                'status' => 'fail',
+                'message' => $e->validator->errors()->first(),
+            ];
+            return response()->json($response, 400);
         } catch (Exception $e) {
             $response = [
                 'status' => 'fail',
@@ -195,5 +189,27 @@ class AuthController extends Controller
         ];
         $accessToken = JWT::encode($accessTokenClaims, env('JWT_SECRET'), 'HS256');
         return $accessToken;
+    }
+
+    private function _generateAndPutRefreshTokenOnDB(string $id, string $email): string
+    {
+        $refreshTokenClaims = [
+            'id' => $id,
+            'email' => $email,
+            'unique' => uniqid(), // agar token berubah setiap dibuat
+        ];
+        $refreshToken = JWT::encode($refreshTokenClaims, env('JWT_SECRET'), 'HS256');
+
+        RefreshToken::create(['token' => $refreshToken]);
+
+        return $refreshToken;
+    }
+
+    private function _verifyMatchPassword($inputPassword, $hashedPassword): void
+    {
+        // var_dump(Hash::check($inputPassword, $hashedPassword));
+        if (!Hash::check($inputPassword, $hashedPassword)) {
+            throw new Exception('wrong email or password');
+        }
     }
 }
