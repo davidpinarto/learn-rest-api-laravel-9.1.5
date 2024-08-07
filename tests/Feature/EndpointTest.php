@@ -27,15 +27,20 @@ class EndpointTest extends TestCase
         //     "password" => "davidpinarto"
         // ])->assertStatus(201);
 
-        $this->post('/api/login', [
-            "email" => "davidpinarto90@admin.com",
-            "password" => "davidpinarto"
-        ])->assertStatus(201);
+        // $this->post('/api/login', [
+        //     "email" => "davidpinarto90@admin.com",
+        //     "password" => "davidpinarto"
+        // ])->assertStatus(201);
 
         // $this->post('/api/login', [
         //     "email" => "davidpinarto90@admin.com",
         //     "password" => "feweyrf983erjewh"
         // ])->assertStatus(201);
+
+        $this->post('/api/login', [
+            "email" => "ups@admin.com",
+            "password" => "feweyrf983erjewh"
+        ])->assertStatus(201);
         // $response->assertStatus(200);
     }
 }

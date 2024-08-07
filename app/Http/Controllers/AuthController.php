@@ -13,6 +13,7 @@ use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 class AuthController extends Controller
 {
@@ -33,15 +34,15 @@ class AuthController extends Controller
                 'password' => 'required|string|min:8|max:50',
             ]);
 
-            $user = User::where('email', $validatedData['email'])->get(); // null or array collection
+            $user = User::where('email', $validatedData['email'])->first(); // null or class model
+            // dump($user);
             // dump(json_encode($user));
-            // dump($user[0]);
             // dump($user[0]->getOriginal()['password']);
             // dump($validatedData['email']);
 
             if ($user) {
                 $inputPassword = $validatedData['password'];
-                $hashedPassword = $user[0]->getOriginal()['password'];
+                $hashedPassword = $user->password;
 
                 // var_dump(Hash::check($inputPassword, $hashedPassword));
                 if (!Hash::check($inputPassword, $hashedPassword)) {
@@ -49,15 +50,16 @@ class AuthController extends Controller
                 }
 
                 $accessTokenClaims = [
-                    'id' => $user[0]->getOriginal()['id'],
-                    'email' => $user[0]->getOriginal()['email'],
-                    'exp' => '360000' // seharusnya 60 detik, namun untuk memperlancar proses developemnt saya set 360000
+                    'id' => $user->id,
+                    'email' => $user->email,
+                    'exp' => time() + '360000' // seharusnya 60 detik, namun untuk memperlancar proses developemnt saya set 360000
                 ];
                 $accessToken = JWT::encode($accessTokenClaims, env('JWT_SECRET'), 'HS256');
 
                 $refreshTokenClaims = [
-                    'id' => $user[0]->getOriginal()['id'],
-                    'email' => $user[0]->getOriginal()['email'],
+                    'id' => $user->id,
+                    'email' => $user->email,
+                    'unique' => uniqid(), // agar token berubah setiap dibuat
                 ];
                 $refreshToken = JWT::encode($refreshTokenClaims, env('JWT_SECRET'), 'HS256');
                 RefreshToken::create(['token' => $refreshToken]);
@@ -71,9 +73,9 @@ class AuthController extends Controller
                     ],
                 ];
                 return response()->json($response, 201);
-            } else {
-                throw new Exception('wrong email or password');
             }
+
+            throw new Exception('wrong email or password');
         } catch (ValidationException $e) {
             $response = [
                 'status' => 'fail',
@@ -107,5 +109,37 @@ class AuthController extends Controller
          * - verify refresh token in the database ? next : invalid refresh token
          * - delete refresh token in the database
          */
+        try {
+            $refreshToken = $request->input('refreshToken'); // string
+            // var_dump($refreshToken);
+            if (!$refreshToken) {
+                throw new Exception('Missing token on request body');
+            }
+
+            $this->_verifyAndDeleteRefreshTokenFromDB($refreshToken);
+
+            $response = [
+                'status' => 'success',
+                'message' => 'Token deleted successfully'
+            ];
+            return response()->json($response);
+        } catch (Exception $e) {
+            $response = [
+                'status' => 'fail',
+                'message' => $e->getMessage(),
+            ];
+            return response()->json($response, 400);
+        }
+    }
+
+    private function _verifyAndDeleteRefreshTokenFromDB(string $refreshToken): void
+    {
+        // verify refresh token in db
+        $refreshTokenFromDB = RefreshToken::where('token', $refreshToken)->delete(); // int(0) or int(1)
+        // var_dump('okay from db');
+        // var_dump($refreshTokenFromDB);
+        if (!$refreshTokenFromDB) {
+            throw new Exception('Token is not valid');
+        }
     }
 }
