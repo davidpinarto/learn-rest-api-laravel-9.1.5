@@ -112,7 +112,7 @@ class AuthController extends Controller
                 'status' => 'fail',
                 'message' => $e->getMessage(),
             ];
-            return response()->json($response, 401);
+            return response()->json($response, 400);
         }
     }
 

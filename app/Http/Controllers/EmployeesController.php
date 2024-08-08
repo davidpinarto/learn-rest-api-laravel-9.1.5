@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ForbiddenException;
+use App\Exceptions\InvariantException;
+use App\Exceptions\NotFoundException;
 use App\Models\Employees;
 use App\Models\User;
 use Exception;
@@ -31,7 +34,7 @@ class EmployeesController extends Controller
             $user = User::where('id', $userData['id'])->first();
 
             if (!$user->is_admin) {
-                throw new Exception('only admin can add new employee data');
+                throw new ForbiddenException('only admin can add new employee data');
             }
 
             $validatedData = $request->validate([
@@ -60,11 +63,11 @@ class EmployeesController extends Controller
                 'status' => 'fail',
                 'message' => $e->validator->errors()->first()
             ], 400);
-        } catch (Exception $e) {
+        } catch (ForbiddenException $e) {
             return response()->json([
                 'status' => 'fail',
                 'message' => $e->getMessage(),
-            ], 400);
+            ], 403);
         }
     }
 
@@ -87,9 +90,9 @@ class EmployeesController extends Controller
                         'data' => $employees,
                     ]);
                 } else {
-                    throw new Exception("employee not found");
+                    throw new NotFoundException("employee not found");
                 }
-            } catch (Exception $e) {
+            } catch (NotFoundException $e) {
                 return response()->json([
                     'status' => 'fail',
                     'message' => $e->getMessage(),
@@ -110,7 +113,7 @@ class EmployeesController extends Controller
             $user = User::where('id', $userData['id'])->first();
 
             if (!$user->is_admin) {
-                throw new Exception('only admin can update employee data');
+                throw new ForbiddenException('only admin can update employee data');
             }
 
             $employee = Employees::find($id); // null or object
@@ -130,6 +133,9 @@ class EmployeesController extends Controller
                     'department_id' => 'string|exists:departments,id',
                 ]);
 
+                if (!count($validatedData)) {
+                    throw new InvariantException('Must include min 1 employee data on request body');
+                };
                 // tidak perlu karena fitur ORM dari method update akan memperbarui column updated_at
                 // $validatedData['updated_at'] = now();
 
@@ -141,14 +147,24 @@ class EmployeesController extends Controller
                     'data' => $employee,
                 ]);
             } else {
-                throw new Exception('employee not found');
+                throw new NotFoundException('employee not found');
             }
         } catch (ValidationException $e) {
             return response()->json([
                 'status' => 'fail',
                 'message' => $e->validator->errors()->first(),
             ], 400);
-        } catch (Exception $e) {
+        } catch (InvariantException $e) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $e->getMessage(),
+            ], 400);
+        } catch (ForbiddenException $e) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $e->getMessage(),
+            ], 403);
+        } catch (NotFoundException $e) {
             return response()->json([
                 'status' => 'fail',
                 'message' => $e->getMessage(),
@@ -163,20 +179,25 @@ class EmployeesController extends Controller
             $user = User::where('id', $userData['id'])->first();
 
             if (!$user->is_admin) {
-                throw new Exception('only admin can delete employee data');
+                throw new ForbiddenException('only admin can delete employee data');
             }
 
             $employee = Employees::find($id)->delete(); // int(0) or int(1)
 
             if (!$employee) {
-                throw new Exception('employee not found');
+                throw new NotFoundException('employee not found');
             }
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'employee deleted successfully',
             ]);
-        } catch (Exception $e) {
+        } catch (ForbiddenException $e) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $e->getMessage(),
+            ], 403);
+        } catch (NotFoundException $e) {
             return response()->json([
                 'status' => 'fail',
                 'message' => $e->getMessage(),

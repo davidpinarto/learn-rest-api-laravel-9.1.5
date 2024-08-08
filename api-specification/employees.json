@@ -1,0 +1,1494 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "REST API Employees",
+    "description": "This is an API for manipulating Employees data",
+    "version": "1.0.0",
+    "contact": {
+      "name": "David Pinarto",
+      "email": "davidpinarto90@gmail.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "{environtment}/api",
+      "description": "Employees REST API Server",
+      "variables": {
+        "environtment": {
+          "default": "http://127.0.0.1:8000",
+          "description": "development environtment",
+          "enum": [
+            "http://127.0.0.1:8000",
+            "https://b715-103-187-106-44.ngrok-free.app"
+          ]
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/employees": {
+      "get": {
+        "summary": "Get all employees",
+        "description": "Get list of all employees on database",
+        "tags": ["Employees"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "first_name": {
+                            "type": "string"
+                          },
+                          "last_name": {
+                            "type": "string"
+                          },
+                          "gender": {
+                            "type": "string"
+                          },
+                          "email": {
+                            "type": "string"
+                          },
+                          "phone_number": {
+                            "type": "string"
+                          },
+                          "hire_date": {
+                            "type": "string"
+                          },
+                          "job_title": {
+                            "type": "string"
+                          },
+                          "department_id": {
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "status": "success",
+                    "data": [
+                      {
+                        "id": "employee-RLDr4iEV2hXjMZts",
+                        "first_name": "Sandy",
+                        "last_name": "Santoso",
+                        "gender": "female",
+                        "email": "sandysantoso@gmail.com",
+                        "phone_number": null,
+                        "hire_date": "2024-08-02 09:08:42",
+                        "job_title": "Sales",
+                        "department_id": "department-cNOCFF0Tqne2PuZe",
+                        "created_at": "2024-08-02T09:08:42.000000Z",
+                        "updated_at": "2024-08-02T09:08:42.000000Z"
+                      },
+                      {
+                        "id": "employee-wmAml0k6k1ebrxiu",
+                        "first_name": "David",
+                        "last_name": "P",
+                        "gender": "male",
+                        "email": "davidpinarto90@gmail.com",
+                        "phone_number": "2983812743",
+                        "hire_date": "2024-08-02 09:08:42",
+                        "job_title": "Backend Developer",
+                        "department_id": "department-4DGW66a8CKJKo4ol",
+                        "created_at": "2024-08-02T09:08:42.000000Z",
+                        "updated_at": "2024-08-05T07:31:35.000000Z"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingToken": {
+                    "summary": "Missing token",
+                    "value": {
+                      "status": "fail",
+                      "message": "Missing token on the Bearer"
+                    }
+                  },
+                  "expiredToken": {
+                    "summary": "Expired token",
+                    "value": {
+                      "status": "fail",
+                      "message": "Token is invalid or expired"
+                    }
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create a new employee",
+        "description": "add new employee data on database, only admin can add new employee",
+        "tags": ["Employees"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "first_name": {
+                    "type": "string"
+                  },
+                  "last_name": {
+                    "type": "string"
+                  },
+                  "gender": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "phone_number": {
+                    "type": "string"
+                  },
+                  "hire_date": {
+                    "type": "string"
+                  },
+                  "job_title": {
+                    "type": "string"
+                  },
+                  "department_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "first_name",
+                  "last_name",
+                  "gender",
+                  "email",
+                  "hire_date",
+                  "job_title",
+                  "department_id"
+                ],
+                "example": {
+                  "first_name": "Yanto",
+                  "last_name": "Inara",
+                  "gender": "male",
+                  "email": "yantokeren@gmail.com",
+                  "phone_number": "02482730249",
+                  "hire_date": "2024-07-29",
+                  "job_title": "Architect",
+                  "department_id": "department-4DGW66a8CKJKo4ol"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "first_name": {
+                            "type": "string"
+                          },
+                          "last_name": {
+                            "type": "string"
+                          },
+                          "gender": {
+                            "type": "string"
+                          },
+                          "email": {
+                            "type": "string"
+                          },
+                          "phone_number": {
+                            "type": "string"
+                          },
+                          "hire_date": {
+                            "type": "string"
+                          },
+                          "job_title": {
+                            "type": "string"
+                          },
+                          "department_id": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "status": "success",
+                    "message": "new employee added successfully",
+                    "data": {
+                      "first_name": "Yanto",
+                      "last_name": "Inara",
+                      "gender": "male",
+                      "email": "yantokeren@gmail.com",
+                      "phone_number": "02482730249",
+                      "hire_date": "2024-07-29",
+                      "job_title": "Architect",
+                      "department_id": "department-4DGW66a8CKJKo4ol",
+                      "id": "employee-JP1KeULf9ABOOP1d",
+                      "updated_at": "2024-08-08T05:58:40.000000Z",
+                      "created_at": "2024-08-08T05:58:40.000000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingToken": {
+                    "summary": "Missing token",
+                    "value": {
+                      "status": "fail",
+                      "message": "Missing token on the Bearer"
+                    }
+                  },
+                  "expiredToken": {
+                    "summary": "Expired token",
+                    "value": {
+                      "status": "fail",
+                      "message": "Token is invalid or expired"
+                    }
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "fail",
+                  "message": "only admin can add new employee data"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "emailAlreadyTaken": {
+                    "summary": "Email has already been taken",
+                    "value": {
+                      "status": "fail",
+                      "message": "The email has already been taken."
+                    }
+                  },
+                  "firstNameRequired": {
+                    "summary": "first name required",
+                    "value": {
+                      "status": "fail",
+                      "message": "The first name field is required."
+                    }
+                  },
+                  "lastNameRequired": {
+                    "summary": "last name required",
+                    "value": {
+                      "status": "fail",
+                      "message": "The last name field is required."
+                    }
+                  },
+                  "genderRequired": {
+                    "summary": "gender required",
+                    "value": {
+                      "status": "fail",
+                      "message": "The gender field is required."
+                    }
+                  },
+                  "emailRequired": {
+                    "summary": "email required",
+                    "value": {
+                      "status": "fail",
+                      "message": "The email field is required."
+                    }
+                  },
+                  "hireDateRequired": {
+                    "summary": "hire date required",
+                    "value": {
+                      "status": "fail",
+                      "message": "The hire date field is required."
+                    }
+                  },
+                  "jobTitleRequired": {
+                    "summary": "job title required",
+                    "value": {
+                      "status": "fail",
+                      "message": "The job title field is required."
+                    }
+                  },
+                  "departmentIdRequired": {
+                    "summary": "department id required",
+                    "value": {
+                      "status": "fail",
+                      "message": "The department id field is required."
+                    }
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employees/search": {
+      "get": {
+        "summary": "Search employee by name",
+        "description": "Get employee data by name",
+        "tags": ["Employees"],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "david",
+            "description": "Name of the employee to search for"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "first_name": {
+                            "type": "string"
+                          },
+                          "last_name": {
+                            "type": "string"
+                          },
+                          "gender": {
+                            "type": "string"
+                          },
+                          "email": {
+                            "type": "string"
+                          },
+                          "phone_number": {
+                            "type": "string"
+                          },
+                          "hire_date": {
+                            "type": "string"
+                          },
+                          "job_title": {
+                            "type": "string"
+                          },
+                          "department_id": {
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "singleData": {
+                    "summary": "Single data",
+                    "value": {
+                      "status": "success",
+                      "data": [
+                        {
+                          "id": "employee-wmAml0k6k1ebrxiu",
+                          "first_name": "David",
+                          "last_name": "P",
+                          "gender": "male",
+                          "email": "davidpinarto90@gmail.com",
+                          "phone_number": "2983812743",
+                          "hire_date": "2024-08-02 09:08:42",
+                          "job_title": "Backend Developer",
+                          "department_id": "department-4DGW66a8CKJKo4ol",
+                          "created_at": "2024-08-02T09:08:42.000000Z",
+                          "updated_at": "2024-08-05T07:31:35.000000Z"
+                        }
+                      ]
+                    }
+                  },
+                  "multipleData": {
+                    "summary": "Multiple data",
+                    "value": {
+                      "status": "success",
+                      "data": [
+                        {
+                          "id": "employee-RLDr4iEV2hXjMZts",
+                          "first_name": "Sandy",
+                          "last_name": "Santoso",
+                          "gender": "female",
+                          "email": "sandysantoso@gmail.com",
+                          "phone_number": null,
+                          "hire_date": "2024-08-02 09:08:42",
+                          "job_title": "Sales",
+                          "department_id": "department-cNOCFF0Tqne2PuZe",
+                          "created_at": "2024-08-02T09:08:42.000000Z",
+                          "updated_at": "2024-08-02T09:08:42.000000Z"
+                        },
+                        {
+                          "id": "employee-VtoCtalGBPSeyotC",
+                          "first_name": "EKO",
+                          "last_name": "Prasetyo",
+                          "gender": "male",
+                          "email": "eko@gmail.com",
+                          "phone_number": "1234567890",
+                          "hire_date": "2024-08-02 09:08:42",
+                          "job_title": "Frontend Developer",
+                          "department_id": "department-4DGW66a8CKJKo4ol",
+                          "created_at": "2024-08-02T09:08:42.000000Z",
+                          "updated_at": "2024-08-05T07:23:07.000000Z"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "status": "fail",
+                  "message": "employee not found"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingToken": {
+                    "summary": "Missing token",
+                    "value": {
+                      "status": "fail",
+                      "message": "Missing token on the Bearer"
+                    }
+                  },
+                  "expiredToken": {
+                    "summary": "Expired token",
+                    "value": {
+                      "status": "fail",
+                      "message": "Token is invalid or expired"
+                    }
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/employees/{id}": {
+      "put": {
+        "summary": "Update an employee by ID",
+        "description": "Update employee data by user id, only admin can update data",
+        "tags": ["Employees"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "employee-7eOKnc455BjXYZaS",
+            "description": "ID of the employee to update"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "first_name": {
+                    "type": "string"
+                  },
+                  "last_name": {
+                    "type": "string"
+                  },
+                  "gender": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "phone_number": {
+                    "type": "string"
+                  },
+                  "hire_date": {
+                    "type": "string"
+                  },
+                  "job_title": {
+                    "type": "string"
+                  },
+                  "department_id": {
+                    "type": "string"
+                  }
+                },
+                "minProperties": 1,
+                "example": {
+                  "first_name": "YANTOOOOOOOOOOO",
+                  "last_name": "Inara",
+                  "gender": "male",
+                  "email": "yantokeren@gmail.com",
+                  "phone_number": "02482730249",
+                  "hire_date": "2024-07-29",
+                  "job_title": "Architect",
+                  "department_id": "department-4DGW66a8CKJKo4ol"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resource updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "first_name": {
+                            "type": "string"
+                          },
+                          "last_name": {
+                            "type": "string"
+                          },
+                          "gender": {
+                            "type": "string"
+                          },
+                          "email": {
+                            "type": "string"
+                          },
+                          "phone_number": {
+                            "type": "string"
+                          },
+                          "hire_date": {
+                            "type": "string"
+                          },
+                          "job_title": {
+                            "type": "string"
+                          },
+                          "department_id": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "status": "success",
+                    "message": "employee updated successfully",
+                    "data": {
+                      "id": "employee-7eOKnc455BjXYZaS",
+                      "first_name": "YANTOOOOOOOOOOO",
+                      "last_name": "Inara",
+                      "gender": "male",
+                      "email": "yantokeren@gmail.com",
+                      "phone_number": "02482730249",
+                      "hire_date": "2024-07-29",
+                      "job_title": "Architect",
+                      "department_id": "department-4DGW66a8CKJKo4ol",
+                      "created_at": "2024-08-08T06:49:09.000000Z",
+                      "updated_at": "2024-08-08T06:52:03.000000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingReqBodyData": {
+                    "summary": "Min. 1 request body data",
+                    "value": {
+                      "status": "fail",
+                      "message": "Must include min 1 employee data on request body"
+                    }
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingToken": {
+                    "summary": "Missing token",
+                    "value": {
+                      "status": "fail",
+                      "message": "Missing token on the Bearer"
+                    }
+                  },
+                  "expiredToken": {
+                    "summary": "Expired token",
+                    "value": {
+                      "status": "fail",
+                      "message": "Token is invalid or expired"
+                    }
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "fail",
+                  "message": "only admin can update new employee data"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "status": "fail",
+                  "message": "employee not found"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete an employee by ID",
+        "description": "Delete employee data by user id, only admin can update data",
+        "tags": ["Employees"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "employee-7eOKnc455BjXYZaS",
+            "description": "ID of the employee to update"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "status": "success",
+                    "message": "employee deleted successfully"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingToken": {
+                    "summary": "Missing token",
+                    "value": {
+                      "status": "fail",
+                      "message": "Missing token on the Bearer"
+                    }
+                  },
+                  "expiredToken": {
+                    "summary": "Expired token",
+                    "value": {
+                      "status": "fail",
+                      "message": "Token is invalid or expired"
+                    }
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "fail",
+                  "message": "only admin can delete employee data"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "status": "fail",
+                  "message": "employee not found"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users": {
+      "post": {
+        "summary": "Create a new user",
+        "description": "For register new user, if you want to be an admin use @admin.com to be an admin, ex. testing@admin.com",
+        "tags": ["Users"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": ["name", "email", "password"]
+              },
+              "examples": {
+                "admin": {
+                  "summary": "admin user",
+                  "value": {
+                    "name": "testing",
+                    "email": "testing@admin.com",
+                    "password": "testingtestingtesting"
+                  }
+                },
+                "notAdmin": {
+                  "summary": "not admin user",
+                  "value": {
+                    "name": "testing",
+                    "email": "testing@gmail.com",
+                    "password": "testingtestingtesting"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "first_name": {
+                            "type": "string"
+                          },
+                          "last_name": {
+                            "type": "string"
+                          },
+                          "gender": {
+                            "type": "string"
+                          },
+                          "email": {
+                            "type": "string"
+                          },
+                          "phone_number": {
+                            "type": "string"
+                          },
+                          "hire_date": {
+                            "type": "string"
+                          },
+                          "job_title": {
+                            "type": "string"
+                          },
+                          "department_id": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "admin": {
+                    "summary": "admin",
+                    "value": {
+                      "status": "success",
+                      "message": "registrasi sukses!",
+                      "data": {
+                        "name": "testing",
+                        "email": "testing@admin.com",
+                        "id": "user-qSv1X3Q3Q92co6bz",
+                        "is_admin": true,
+                        "updated_at": "2024-08-08T07:41:48.000000Z",
+                        "created_at": "2024-08-08T07:41:48.000000Z"
+                      }
+                    }
+                  },
+                  "notAdmin": {
+                    "summary": "not admin",
+                    "value": {
+                      "status": "success",
+                      "message": "registrasi sukses!",
+                      "data": {
+                        "name": "testing2",
+                        "email": "testing@notadmin.com",
+                        "id": "user-wyhwL8RB1pxbDfLl",
+                        "updated_at": "2024-08-08T07:45:24.000000Z",
+                        "created_at": "2024-08-08T07:45:24.000000Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "emailAlreadyTaken": {
+                    "summary": "Email has already been used",
+                    "value": {
+                      "status": "fail",
+                      "message": "The email address is already in use."
+                    }
+                  },
+                  "passwordMin8": {
+                    "summary": "Min. 8 char length password",
+                    "value": {
+                      "status": "fail",
+                      "message": "The password must be at least 8 characters."
+                    }
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/authentications": {
+      "post": {
+        "summary": "Authenticate user",
+        "description": "To create new access token and refresh token",
+        "tags": ["Authentications"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": ["email", "password"]
+              },
+              "example": {
+                "email": "testing@admin.com",
+                "password": "testingtestingtesting"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "access_token": {
+                          "type": "string"
+                        },
+                        "refresh_token": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "status": "success",
+                  "message": "login success",
+                  "data": {
+                    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIteGdMTWRpcUpCd0xTMkVyUiIsImVtYWlsIjoiZGF2aWRwaW5hcnRvOTBAYWRtaW4uY29tIiwiZXhwIjoxNzIzNDYzNTc5fQ.6sW-UXyT7p3Y4axC9V4y50jtSwMEtzG3W2OiIQ-OC2M",
+                    "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIteGdMTWRpcUpCd0xTMkVyUiIsImVtYWlsIjoiZGF2aWRwaW5hcnRvOTBAYWRtaW4uY29tIiwidW5pcXVlIjoiNjZiNDc5NWIxMzM4NSJ9.zqtZupMh7Sjw7jgVnpZV8Wv2f6GsYyrPBTR0g-LG2tI"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "emailRequired": {
+                    "summary": "Email required",
+                    "value": {
+                      "status": "fail",
+                      "message": "The email field is required."
+                    }
+                  },
+                  "passwordRequired": {
+                    "summary": "Password required",
+                    "value": {
+                      "status": "fail",
+                      "message": "The password field is required."
+                    }
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "fail",
+                  "message": "wrong email or password"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Logout user",
+        "tags": ["Authentications"],
+        "description": "Delete refresh token on the database",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refreshToken": {
+                    "type": "string"
+                  }
+                },
+                "required": ["refreshToken"]
+              },
+              "example": {
+                "refreshToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIteGdMTWRpcUpCd0xTMkVyUiIsImVtYWlsIjoiZGF2aWRwaW5hcnRvOTBAYWRtaW4uY29tIiwidW5pcXVlIjoiNjZiNDc5NWIxMzM4NSJ9.zqtZupMh7Sjw7jgVnpZV8Wv2f6GsYyrPBTR0g-LG2tI"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token delete success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "status": "success",
+                    "message": "Token deleted successfully"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "tokenMustString": {
+                    "summary": "data type must string",
+                    "value": {
+                      "status": "fail",
+                      "message": "The refresh token must be a string."
+                    }
+                  },
+                  "tokenNotValid": {
+                    "summary": "token not valid",
+                    "value": {
+                      "status": "fail",
+                      "message": "Token is not valid"
+                    }
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Refresh token",
+        "tags": ["Authentications"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refreshToken": {
+                    "type": "string"
+                  }
+                },
+                "required": ["refreshToken"]
+              },
+              "example": {
+                "refreshToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIteGdMTWRpcUpCd0xTMkVyUiIsImVtYWlsIjoiZGF2aWRwaW5hcnRvOTBAYWRtaW4uY29tIiwidW5pcXVlIjoiNjZiNDc5NWIxMzM4NSJ9.zqtZupMh7Sjw7jgVnpZV8Wv2f6GsYyrPBTR0g-LG2tI"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resource updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "access_token": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "status": "success",
+                    "message": "Create new access token success",
+                    "data": {
+                      "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXIteGdMTWRpcUpCd0xTMkVyUiIsImVtYWlsIjoiZGF2aWRwaW5hcnRvOTBAYWRtaW4uY29tIiwiZXhwIjoxNzIzNDY1NDk2fQ.xNpebSyUl8hglSYQhKUtBsZUphnBCB30-0qjkcMrpws"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "tokenMustString": {
+                    "summary": "data type must string",
+                    "value": {
+                      "status": "fail",
+                      "message": "The refresh token must be a string."
+                    }
+                  },
+                  "tokenNotValid": {
+                    "summary": "token not valid",
+                    "value": {
+                      "status": "fail",
+                      "message": "Token is not valid"
+                    }
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
