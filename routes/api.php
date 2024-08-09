@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DepartmentsController;
 use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,8 @@ Route::middleware('jwt.verify')->group(function () {
     Route::get('/employees/search', [EmployeesController::class, 'getEmployeeByName']);
     Route::put('/employees/{id}', [EmployeesController::class, 'updateEmployeeById']);
     Route::delete('/employees/{id}', [EmployeesController::class, 'deleteEmployeeById']);
+
+    Route::get('/departments', [DepartmentsController::class, 'getDepartments']);
 });
 
 Route::post('/users', [UserController::class, 'postUser']);

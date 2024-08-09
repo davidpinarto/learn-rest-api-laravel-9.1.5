@@ -17,15 +17,112 @@
         "environtment": {
           "default": "http://127.0.0.1:8000",
           "description": "development environtment",
-          "enum": [
-            "http://127.0.0.1:8000",
-            "https://b715-103-187-106-44.ngrok-free.app"
-          ]
+          "enum": ["http://127.0.0.1:8000", "http://103.174.114.24:8000"]
         }
       }
     }
   ],
   "paths": {
+    "/departments": {
+      "get": {
+        "summary": "Get all departments",
+        "description": "Get list of all departments on database",
+        "tags": ["Departments"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "department_name": {
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "status": "success",
+                    "data": [
+                      {
+                        "id": "department-4DGW66a8CKJKo4ol",
+                        "department_name": "Engineer",
+                        "created_at": "2024-08-02T09:08:42.000000Z",
+                        "updated_at": "2024-08-02T09:08:42.000000Z"
+                      },
+                      {
+                        "id": "department-cNOCFF0Tqne2PuZe",
+                        "department_name": "Marketing",
+                        "created_at": "2024-08-02T09:08:42.000000Z",
+                        "updated_at": "2024-08-02T09:08:42.000000Z"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingToken": {
+                    "summary": "Missing token",
+                    "value": {
+                      "status": "fail",
+                      "message": "Missing token on the Bearer"
+                    }
+                  },
+                  "expiredToken": {
+                    "summary": "Expired token",
+                    "value": {
+                      "status": "fail",
+                      "message": "Token is invalid or expired"
+                    }
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/employees": {
       "get": {
         "summary": "Get all employees",
