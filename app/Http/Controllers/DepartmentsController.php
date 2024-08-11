@@ -3,20 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Models\Departments;
+use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class DepartmentsController extends Controller
 {
-    public function getDepartments(Request $request): JsonResponse
+    public function getDepartments(): JsonResponse
     {
-        $departments = Departments::all();
+        try {
+            $departments = Departments::all();
 
-        $response = [
-            'status' => 'success',
-            'data' => $departments
-        ];
-        return response()->json($response);
+            $response = [
+                'status' => 'success',
+                'data' => $departments
+            ];
+            return response()->json($response);
+        } catch (Exception $e) {
+            $response = [
+                'status' => 'fail',
+                'message' => 'There is something error on our server',
+            ];
+            return response()->json($response, 500);
+        }
     }
-
 }
