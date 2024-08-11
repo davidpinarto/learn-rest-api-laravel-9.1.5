@@ -1,7 +1,10 @@
 <?php
 namespace App\Helpers;
 
+use App\Exceptions\InvariantException;
+use App\Exceptions\UnauthorizedException;
 use App\Models\RefreshToken;
+use App\Models\User;
 use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -12,18 +15,15 @@ class AuthHelper
 {
   public static function verifyAndDeleteRefreshTokenFromDB(string $refreshToken): void
   {
-    // verify refresh token in db
     $refreshTokenFromDB = RefreshToken::where('token', $refreshToken)->delete(); // int(0) or int(1)
-    // var_dump('okay from db');
-    // var_dump($refreshTokenFromDB);
     if (!$refreshTokenFromDB) {
-      throw new Exception('Token is not valid');
+      throw new InvariantException('Token is not valid');
     }
   }
 
   public static function verifyRefreshTokenSecret(string $refreshToken): stdClass
   {
-    // if the secret wrong it will throw "Signature verification failed"
+    // if the secret wrong it will throw "Signature verification failed" SignatureInvalidException
     $decoded = JWT::decode($refreshToken,  new Key(env('JWT_SECRET'), 'HS256'));  // object(stdClass)
     return $decoded;
   }
@@ -32,7 +32,7 @@ class AuthHelper
   {
     $refreshTokenFromDB = RefreshToken::where('token', $refreshToken)->first(); // null or class model
     if (!$refreshTokenFromDB) {
-      throw new Exception('Token is not valid');
+      throw new InvariantException('Token is not valid');
     }
   }
 
@@ -66,7 +66,17 @@ class AuthHelper
   {
     // var_dump(Hash::check($inputPassword, $hashedPassword));
     if (!Hash::check($inputPassword, $hashedPassword)) {
-      throw new Exception('wrong email or password');
+      throw new UnauthorizedException('wrong email or password');
     }
+  }
+
+  public static function verifyAndGetUserDataInDB(string $email): User {
+    $user = User::where('email', $email)->first(); // null or class model
+
+    if (!$user) {
+        throw new UnauthorizedException('wrong email or password');
+    }
+
+    return $user;
   }
 }
