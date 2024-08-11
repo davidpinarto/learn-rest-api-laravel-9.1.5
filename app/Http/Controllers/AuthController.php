@@ -7,7 +7,6 @@ use App\Exceptions\UnauthorizedException;
 use App\Helpers\AuthHelper;
 use Firebase\JWT\SignatureInvalidException;
 use Illuminate\Http\Request;
-use App\Models\User;
 use Exception;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
