@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Exceptions\InvariantException;
 use Closure;
 use Exception;
 use Firebase\JWT\ExpiredException;
@@ -11,6 +12,8 @@ use Illuminate\Http\Request;
 use UnexpectedValueException;
 use Firebase\JWT\SignatureInvalidException;
 use App\Exceptions\UnauthorizedException;
+use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class VerifyJwtToken
 {
@@ -23,47 +26,19 @@ class VerifyJwtToken
      */
     public function handle(Request $request, Closure $next)
     {
-        try {
-            $token = $request->bearerToken();  // string of the token
+        $token = $request->bearerToken();  // string of the token
 
-            if (!$token) {
-                throw new UnauthorizedException('Missing token on the Bearer');
-            }
-
-            $credentials = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
-
-            $request->userData = [
-                'id' => $credentials->id,
-                'email' => $credentials->email
-            ];
-
-            return $next($request);
-        } catch (Exception $e) {
-            if (
-                $e instanceof UnauthorizedException
-                || $e instanceof SignatureInvalidException
-                || $e instanceof UnexpectedValueException  // ketika user mengisi nilai sembarang pada Bearer token
-            ) {
-                $response = [
-                    'status' => 'fail',
-                    'message' => $e->getMessage(),
-                ];
-                return response()->json($response, 401);
-            }
-
-            if ($e instanceof ExpiredException) {
-                $response = [
-                    'status' => 'fail',
-                    'message' => 'Token is invalid or expired'
-                ];
-                return response()->json($response, 401);
-            }
-
-            $response = [
-                'status' => 'fail',
-                'message' => 'There is something error on our server',
-            ];
-            return response()->json($response, 500);
+        if (!$token) {
+            throw new UnauthorizedException('Missing token on the Bearer');
         }
+
+        $credentials = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
+
+        $request->userData = [
+            'id' => $credentials->id,
+            'email' => $credentials->email
+        ];
+
+        return $next($request);
     }
 }

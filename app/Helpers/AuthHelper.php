@@ -5,7 +5,6 @@ use App\Exceptions\InvariantException;
 use App\Exceptions\UnauthorizedException;
 use App\Models\RefreshToken;
 use App\Models\User;
-use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Support\Facades\Hash;
