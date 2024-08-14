@@ -10,19 +10,19 @@ class AuthController extends Controller
 {
     public function postAuthentication(Request $request): JsonResponse
     {
-        $validatedData = $request->validate([
+        $rules = [
             'email' => 'required|string|max:255',
             'password' => 'required|string|min:8|max:50',
-        ]);
+        ];
+        ['email' => $email, 'password' => $inputPassword] = $request->validate($rules);
 
-        $user = AuthHelper::verifyAndGetUserDataInDB($validatedData['email']);
+        $userData = AuthHelper::verifyAndGetUserDataInDB($email);
 
-        $inputPassword = $validatedData['password'];
-        $hashedPassword = $user->password;
+        $hashedPassword = $userData->password;
         AuthHelper::verifyMatchPassword($inputPassword, $hashedPassword);
 
-        $accessToken = AuthHelper::generateAccessToken($user->id, $user->email);
-        $refreshToken = AuthHelper::generateAndPutRefreshTokenOnDB($user->id, $user->email);
+        $accessToken = AuthHelper::generateAccessToken($userData->id, $email);
+        $refreshToken = AuthHelper::generateAndPutRefreshTokenOnDB($userData->id, $email);
 
         $response = [
             'status' => 'success',
@@ -37,15 +37,19 @@ class AuthController extends Controller
 
     public function putAuthentication(Request $request): JsonResponse
     {
-        $validatedData = $request->validate([
+        $rules = [
             'refreshToken' => 'required|string',
-        ]);
-        $refreshToken = $validatedData['refreshToken'];
+        ];
+        ['refreshToken' => $refreshToken] = $request->validate($rules);
 
-        $decoded = AuthHelper::verifyRefreshTokenSecret($refreshToken);  // SignatureInvalidException or obj(stdclass)
+        [
+            'userId' => $userId,
+            'userEmail' => $userEmail,
+        ] = AuthHelper::verifyRefreshTokenSecretAndGetUserData($refreshToken);  // SignatureInvalidException or obj(stdclass)
+        
         AuthHelper::verifyRefreshTokenFromDB($refreshToken);  // InvariantException
 
-        $newAccessToken = AuthHelper::generateAccessToken($decoded->id, $decoded->email);
+        $newAccessToken = AuthHelper::generateAccessToken($userId, $userEmail);
 
         $response = [
             'status' => 'success',
@@ -59,10 +63,10 @@ class AuthController extends Controller
 
     public function deleteAuthentication(Request $request): JsonResponse
     {
-        $validatedData = $request->validate([
+        $rules = [
             'refreshToken' => 'required|string',
-        ]);  // validation exception
-        $refreshToken = $validatedData['refreshToken'];
+        ];
+        ['refreshToken' => $refreshToken] = $request->validate($rules);
 
         AuthHelper::verifyAndDeleteRefreshTokenFromDB($refreshToken);  // invariant exception
 

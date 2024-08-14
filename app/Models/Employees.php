@@ -15,7 +15,17 @@ class Employees extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id', 'first_name', 'last_name', 'gender', 'email', 'phone_number', 'hire_date', 'job_title', 'department_id', 'created_at', 'updated_at'
+        'id',
+        'first_name',
+        'last_name',
+        'gender',
+        'email',
+        'phone_number',
+        'hire_date',
+        'job_title',
+        'department_id',
+        'created_at',
+        'updated_at'
     ];
 
     public function department()

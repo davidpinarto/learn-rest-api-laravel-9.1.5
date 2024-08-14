@@ -15,7 +15,10 @@ class Departments extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id', 'department_name', 'created_at', 'updated_at'
+        'id', 
+        'department_name', 
+        'created_at', 
+        'updated_at'
     ];
 
     public function employees()

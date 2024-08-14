@@ -15,7 +15,14 @@ class EmployeesPositions extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'id', 'employee_id', 'position', 'salary', 'start_date', 'end_date', 'created_at', 'updated_at'
+        'id', 
+        'employee_id', 
+        'position', 
+        'salary', 
+        'start_date', 
+        'end_date', 
+        'created_at', 
+        'updated_at'
     ];
 
     public function employee()

@@ -21,7 +21,7 @@ Route::middleware('jwt.verify')->group(function () {
     Route::get('/employees', [EmployeesController::class, 'getEmployees']);
     Route::post('/employees', [EmployeesController::class, 'postEmployee']);
     Route::get('/employees/search', [EmployeesController::class, 'getEmployeeByName']);
-    Route::put('/employees/{id}', [EmployeesController::class, 'updateEmployeeById']);
+    Route::put('/employees/{id}', [EmployeesController::class, 'putEmployeeById']);
     Route::delete('/employees/{id}', [EmployeesController::class, 'deleteEmployeeById']);
 
     Route::get('/departments', [DepartmentsController::class, 'getDepartments']);

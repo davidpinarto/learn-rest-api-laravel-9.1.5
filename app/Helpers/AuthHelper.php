@@ -20,11 +20,15 @@ class AuthHelper
     }
   }
 
-  public static function verifyRefreshTokenSecret(string $refreshToken): stdClass
+  public static function verifyRefreshTokenSecretAndGetUserData(string $refreshToken): array
   {
     // if the secret wrong it will throw "Signature verification failed" SignatureInvalidException
     $decoded = JWT::decode($refreshToken,  new Key(env('JWT_SECRET'), 'HS256'));  // object(stdClass)
-    return $decoded;
+    $userData = [
+      'userId' => $decoded->id,
+      'userEmail' => $decoded->email,
+    ];
+    return $userData;
   }
 
   public static function verifyRefreshTokenFromDB(string $refreshToken): void

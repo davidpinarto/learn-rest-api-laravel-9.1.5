@@ -10,21 +10,22 @@ class UserHelper
 {
   public static function validateHashCreateUserData(Request $request): array
   {
-    $userData = $request->validate([
+    $rules = [
       'name' => 'required|string|max:20',
       'email' => 'required|string|max:255',
       'password' => 'required|string|min:8|max:50',
-    ]);
+    ];
+    $validatedData = $request->validate($rules);
 
-    $userData['id'] = 'user-' . Str::random(16);
+    $validatedData['id'] = 'user-' . Str::random(16);
 
-    if (Str::endsWith($userData['email'], '@admin.com')) {
-      $userData['is_admin'] = true;
+    if (Str::endsWith($validatedData['email'], '@admin.com')) {
+      $validatedData['is_admin'] = true;
     }
 
-    $hashedPassword = Hash::make($userData['password']);
-    $userData['password'] = $hashedPassword;
+    $hashedPassword = Hash::make($validatedData['password']);
+    $validatedData['password'] = $hashedPassword;
 
-    return $userData;
+    return $validatedData;
   }
 }

@@ -13,13 +13,13 @@ use Illuminate\Support\Str;
 
 class EmployeesHelper
 {
-  public static function verifyRequestBodyPost(Request $request): array
+  public static function verifyAndModifyRequestBodyPost(Request $request): array
   {
     /**
      * In Laravel, when you use the validate method with the unique rule, Laravel automatically checks the database for the 
      * existence of the value you are validating. 
      */
-    $validatedData = $request->validate([
+    $rules = [
       'first_name' => 'required|string|max:20',
       'last_name' => 'required|string|max:20',
       'gender' => 'required|string|in:male,female',
@@ -28,19 +28,20 @@ class EmployeesHelper
       'hire_date' => 'required|string',
       'job_title' => 'required|string',
       'department_id' => 'required|string|exists:departments,id',
-    ]);
+    ];
+    $validatedData = $request->validate($rules);
 
     $validatedData['id'] = 'employee-' . Str::random(16);
 
     return $validatedData;
   }
 
-  public static function verifyUserAdmin(array $userData): void
+  public static function verifyUserAdminByUserId(string $id): void
   {
-    $user = User::where('id', $userData['id'])->first();
+    $user = User::where('id', $id)->first();
 
     if (!$user->is_admin) {
-      throw new ForbiddenException('only admin can add new employee data');
+      throw new ForbiddenException('only admin can add, update, or delete employee data');
     }
   }
 
@@ -68,9 +69,9 @@ class EmployeesHelper
     return $employee;
   }
 
-  public static function verifyRequestBodyPut(Request $request): array
+  public static function verifyAndGetRequestBodyPut(Request $request): array
   {
-    $validatedData = $request->validate([
+    $rules = [
       'first_name' => 'string|max:20',
       'last_name' => 'string|max:20',
       'gender' => 'string|in:male,female',
@@ -79,7 +80,8 @@ class EmployeesHelper
       'hire_date' => 'string',
       'job_title' => 'string',
       'department_id' => 'string|exists:departments,id',
-    ]);
+    ];
+    $validatedData = $request->validate($rules);
 
     if (!count($validatedData)) {
       throw new InvariantException('Must include min 1 employee data on request body');

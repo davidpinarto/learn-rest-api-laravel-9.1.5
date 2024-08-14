@@ -23,9 +23,9 @@ class EmployeesController extends Controller
 
     public function postEmployee(Request $request): JsonResponse
     {
-        EmployeesHelper::verifyUserAdmin($request->userData);  // ForbiddenException
+        EmployeesHelper::verifyUserAdminByUserId($request->userData['id']);  // ForbiddenException
 
-        $requestBodyData = EmployeesHelper::verifyRequestBodyPost($request);  // ValidationError
+        $requestBodyData = EmployeesHelper::verifyAndModifyRequestBodyPost($request);  // ValidationError
 
         AddNewEmployee::dispatch($requestBodyData);
 
@@ -36,7 +36,7 @@ class EmployeesController extends Controller
         return response()->json($response, 201);
     }
 
-    public function getEmployeeByName(Request $request): JsonResponse
+    public function getEmployeesByName(Request $request): JsonResponse
     {
         $name = $request->query('name'); // null or string
 
@@ -49,13 +49,13 @@ class EmployeesController extends Controller
         return response()->json($response);
     }
 
-    public function updateEmployeeById(Request $request, string $id): JsonResponse
+    public function putEmployeeById(Request $request, string $id): JsonResponse
     {
-        EmployeesHelper::verifyUserAdmin($request->userData);  // ForbiddenException
+        EmployeesHelper::verifyUserAdminByUserId($request->userData['id']);  // ForbiddenException
 
         $employee = EmployeesHelper::getEmployeeById($id); // NotFoundException
 
-        $requestBodyData = EmployeesHelper::verifyRequestBodyPut($request);  // InvariantException
+        $requestBodyData = EmployeesHelper::verifyAndGetRequestBodyPut($request);  // InvariantException
 
         $employee->update($requestBodyData); // fitur ORM dari method update akan memperbarui column updated_at
 
@@ -69,7 +69,7 @@ class EmployeesController extends Controller
 
     public function deleteEmployeeById(Request $request, string $id): JsonResponse
     {
-        EmployeesHelper::verifyUserAdmin($request->userData);  // ForbiddenException
+        EmployeesHelper::verifyUserAdminByUserId($request->userData['id']);  // ForbiddenException
         EmployeesHelper::deleteEmployeeById($id); // NotFoundException
 
         $response = [

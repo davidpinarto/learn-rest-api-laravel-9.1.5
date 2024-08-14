@@ -26,17 +26,18 @@ class VerifyJwtToken
      */
     public function handle(Request $request, Closure $next)
     {
-        $token = $request->bearerToken();  // string of the token
+        $accessToken = $request->bearerToken();  // string of the token
 
-        if (!$token) {
+        if (!$accessToken) {
             throw new UnauthorizedException('Missing token on the Bearer');
         }
 
-        $credentials = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
+        $secretKey = new Key(env('JWT_SECRET'), 'HS256');
+        ['id' => $userId, 'email' => $userEmail] = JWT::decode($accessToken, $secretKey);
 
         $request->userData = [
-            'id' => $credentials->id,
-            'email' => $credentials->email
+            'id' => $userId,
+            'email' => $userEmail
         ];
 
         return $next($request);
