@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\EmployeesHelper;
+use App\Jobs\AddNewEmployee;
 use App\Models\Employees;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -26,12 +27,11 @@ class EmployeesController extends Controller
 
         $requestBodyData = EmployeesHelper::verifyRequestBodyPost($request);  // ValidationError
 
-        $employee = Employees::create($requestBodyData); // QueryException if email already been taken code 23000
+        AddNewEmployee::dispatch($requestBodyData);
 
         $response = [
             'status' => 'success',
             'message' => 'new employee added successfully',
-            'data' => $employee,
         ];
         return response()->json($response, 201);
     }
