@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Throwable;
 
 class AddNewEmployee implements ShouldQueue
 {
@@ -35,5 +36,12 @@ class AddNewEmployee implements ShouldQueue
         var_dump('berhasil horee');
         sleep(10);
         Employees::create($this->requestBodyData); // QueryException if email already been taken code 23000
+    }
+
+    public function failed(Throwable $e)
+    {
+        /**
+         * Do some log here, maybe send a notification why the Queue is failed to process the logic
+         */
     }
 }
